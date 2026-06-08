@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swift Pages – Website Generator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .card { background: white; border-radius: 16px; padding: 2rem; max-width: 640px; width: 100%; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #111; }
+  .header .logo { font-size: 22px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field { margin-bottom: 12px; }
+  label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
+  input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; color: #111; background: white; outline: none; transition: border 0.15s; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { border-color: #555; }
+  textarea { height: 80px; resize: vertical; }
+  .radio-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+  .radio-group label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; cursor: pointer; margin: 0; }
+  .btn { width: 100%; padding: 11px; background: #111; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.15s; margin-top: 1rem; }
+  .btn:hover { background: #333; }
+  .btn:disabled { background: #999; cursor: not-allowed; }
+  .btn-secondary { background: white; color: #111; border: 1px solid #e0e0e0; }
+  .btn-secondary:hover { background: #f5f5f5; }
+  .grid-2-btn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .status { background: #f5f5f5; border-radius: 8px; padding: 12px; font-size: 14px; color: #666; margin-top: 1rem; display: none; }
+  .result { margin-top: 1rem; display: none; }
+  .result label { margin-bottom: 6px; }
+  .result textarea { font-family: 'Courier New', monospace; font-size: 12px; height: 180px; background: #f9f9f9; }
+  .success-msg { font-size: 13px; color: #2e7d32; text-align: center; margin-top: 6px; display: none; }
+  .divider { height: 1px; background: #f0f0f0; margin: 1.5rem 0; }
+  .section-title { font-size: 13px; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <span class="logo">⚡</span>
+    <h1>Swift Pages – Website Generator</h1>
+  </div>
+
+  <div class="section-title">Kundeninfos</div>
+
+  <div class="grid-2">
+    <div>
+      <label>Firmenname *</label>
+      <input type="text" id="firmenname" placeholder="z.B. Café Sonnenschein" />
+    </div>
+    <div>
+      <label>Branche *</label>
+      <select id="branche">
+        <option value="">Branche wählen...</option>
+        <option value="Restaurant / Café">Restaurant / Café</option>
+        <option value="Friseur / Salon">Friseur / Salon</option>
+        <option value="Handwerker">Handwerker</option>
+        <option value="Nagelstudio / Kosmetik">Nagelstudio / Kosmetik</option>
+        <option value="Physiotherapeut / Massage">Physiotherapeut / Massage</option>
+        <option value="Zahnarzt / Arzt">Zahnarzt / Arzt</option>
+        <option value="Fitnessstudio / Yoga">Fitnessstudio / Yoga</option>
+        <option value="Einzelhandel / Shop">Einzelhandel / Shop</option>
+        <option value="Reinigung / Haushaltsservice">Reinigung / Haushaltsservice</option>
+        <option value="Andere">Andere</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <label>Stadt *</label>
+      <input type="text" id="stadt" placeholder="z.B. München" />
+    </div>
+    <div>
+      <label>Telefon (optional)</label>
+      <input type="text" id="telefon" placeholder="z.B. 089 123456" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label>E-Mail des Kunden (optional)</label>
+    <input type="text" id="email" placeholder="z.B. info@beispiel.de" />
+  </div>
+
+  <div class="field">
+    <label>Kurze Beschreibung</label>
+    <textarea id="beschreibung" placeholder="z.B. Familiäres Restaurant mit bayerischer Küche, seit 1995 in München-Schwabing..."></textarea>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title">Design</div>
+
+  <div class="radio-group">
+    <label><input type="radio" name="stil" value="modern" checked /> Modern & Minimalistisch</label>
+    <label><input type="radio" name="stil" value="warm" /> Warm & Einladend</label>
+    <label><input type="radio" name="stil" value="premium" /> Premium & Elegant</label>
+  </div>
+
+  <button class="btn" id="generate-btn" onclick="generateWebsite()">⚡ Website generieren</button>
+
+  <div class="status" id="status">KI erstellt deine Website...</div>
+
+  <div class="result" id="result">
+    <div class="divider"></div>
+    <div class="section-title">Generierter Code</div>
+    <label style="font-size:13px; color:#666;">Kopiere den Code und speichere ihn als <strong>index.html</strong></label>
+    <textarea id="output-code" readonly></textarea>
+    <div class="grid-2-btn">
+      <button class="btn btn-secondary" onclick="copyCode()">Kopieren</button>
+      <button class="btn btn-secondary" onclick="generateEmail()">Kalt-Mail generieren</button>
+    </div>
+    <div class="success-msg" id="copy-msg">Code kopiert!</div>
+  </div>
+
+  <div class="result" id="email-result">
+    <div class="divider"></div>
+    <div class="section-title">Kalt-Mail Vorlage</div>
+    <textarea id="output-email" readonly style="height:200px;"></textarea>
+    <button class="btn btn-secondary" onclick="copyEmail()" style="margin-top:8px;">E-Mail kopieren</button>
+    <div class="success-msg" id="copy-email-msg">E-Mail kopiert!</div>
+  </div>
+</div>
+
+<script>
+const API_KEY = 'DEIN_API_KEY_HIER';
+
+async function callClaude(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  return data.content.map(b => b.text || '').join('').replace(/```html|```/g, '').trim();
+}
+
+async function generateWebsite() {
+  const firmenname = document.getElementById('firmenname').value.trim();
+  const branche = document.getElementById('branche').value;
+  const stadt = document.getElementById('stadt').value.trim();
+  const telefon = document.getElementById('telefon').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const beschreibung = document.getElementById('beschreibung').value.trim();
+  const stil = document.querySelector('input[name="stil"]:checked').value;
+
+  if (!firmenname || !branche || !stadt) { alert('Bitte Firmenname, Branche und Stadt ausfüllen.'); return; }
+
+  const stilMap = {
+    modern: 'modernes minimalistisches Design, viel Weißraum, klare Linien, serifenlose Schriften',
+    warm: 'warmes einladendes Design, warme Farbtöne, freundliche Atmosphäre, persönlich',
+    premium: 'elegantes Premium-Design, dunkle Akzentfarben, hochwertige Typografie, exklusiv'
+  };
+
+  document.getElementById('status').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('email-result').style.display = 'none';
+  document.getElementById('generate-btn').disabled = true;
+
+  try {
+    const html = await callClaude(`Erstelle eine vollständige professionelle HTML-Website als einzelne index.html Datei für:
+
+Firmenname: ${firmenname}
+Branche: ${branche}
+Stadt: ${stadt}
+${telefon ? 'Telefon: ' + telefon : ''}
+${email ? 'E-Mail: ' + email : ''}
+${beschreibung ? 'Beschreibung: ' + beschreibung : ''}
+Stil: ${stilMap[stil]}
+
+Pflichtanforderungen:
+- Vollständiges HTML mit eingebettetem CSS
+- Hero-Bereich, Über-uns, Leistungen, Kontakt
+- Deutsches Impressum (§5 TMG): Inhabername, Adresse ${stadt}, E-Mail${telefon ? ', Tel' : ''}
+- Datenschutzerklärung nach DSGVO
+- Responsive Design
+- Professionelle Farbpalette passend zur Branche
+
+Nur reinen HTML-Code ausgeben, kein Markdown, keine Erklärungen.`);
+
+    document.getElementById('output-code').value = html;
+    document.getElementById('status').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('generate-btn').disabled = false;
+    window._data = { firmenname, branche, stadt };
+  } catch(e) {
+    document.getElementById('status').textContent = 'Fehler – bitte nochmal versuchen.';
+    document.getElementById('generate-btn').disabled = false;
+  }
+}
+
+async function generateEmail() {
+  const d = window._data;
+  if (!d) return;
+  document.getElementById('email-result').style.display = 'block';
+  document.getElementById('output-email').value = 'E-Mail wird generiert...';
+
+  const mail = await callClaude(`Schreib eine kurze professionelle Kaltakquise-E-Mail auf Deutsch an "${d.firmenname}" (${d.branche}) in ${d.stadt}.
+
+Absender: Léon, Swift Pages (swift-pages.de)
+Situation: Wir haben bereits eine kostenlose Demo-Website für sie erstellt.
+Ton: Persönlich, freundlich, nicht aufdringlich, kein Spam-Gefühl.
+Länge: Max 5-6 Sätze.
+Betreff und E-Mail-Text ausgeben, kein Markdown.`);
+
+  document.getElementById('output-email').value = mail;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(document.getElementById('output-code').value);
+  document.getElementById('copy-msg').style.display = 'block';
+  setTimeout(() => document.getElementById('copy-msg').style.display = 'none', 2000);
+}
+
+function copyEmail() {
+  navigator.clipboard.writeText(document.getElementById('output-email').value);
+  document.getElementById('copy-email-msg').style.display = 'block';
+  setTimeout(() => document.getElementById('copy-email-msg').style.display = 'none', 2000);
+}
+</script>
+</body>
+</html>
