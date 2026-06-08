@@ -10,7 +10,6 @@
   .card { background: white; border-radius: 16px; padding: 2rem; max-width: 640px; width: 100%; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
   .header h1 { font-size: 20px; font-weight: 600; color: #111; }
-  .header .logo { font-size: 22px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   .field { margin-bottom: 12px; }
   label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
@@ -22,12 +21,11 @@
   .btn { width: 100%; padding: 11px; background: #111; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.15s; margin-top: 1rem; }
   .btn:hover { background: #333; }
   .btn:disabled { background: #999; cursor: not-allowed; }
-  .btn-secondary { background: white; color: #111; border: 1px solid #e0e0e0; }
+  .btn-secondary { background: white; color: #111; border: 1px solid #e0e0e0; margin-top: 0; }
   .btn-secondary:hover { background: #f5f5f5; }
   .grid-2-btn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
   .status { background: #f5f5f5; border-radius: 8px; padding: 12px; font-size: 14px; color: #666; margin-top: 1rem; display: none; }
   .result { margin-top: 1rem; display: none; }
-  .result label { margin-bottom: 6px; }
   .result textarea { font-family: 'Courier New', monospace; font-size: 12px; height: 180px; background: #f9f9f9; }
   .success-msg { font-size: 13px; color: #2e7d32; text-align: center; margin-top: 6px; display: none; }
   .divider { height: 1px; background: #f0f0f0; margin: 1.5rem 0; }
@@ -37,7 +35,7 @@
 <body>
 <div class="card">
   <div class="header">
-    <span class="logo">⚡</span>
+    <span style="font-size:22px;">⚡</span>
     <h1>Swift Pages – Website Generator</h1>
   </div>
 
@@ -52,16 +50,16 @@
       <label>Branche *</label>
       <select id="branche">
         <option value="">Branche wählen...</option>
-        <option value="Restaurant / Café">Restaurant / Café</option>
-        <option value="Friseur / Salon">Friseur / Salon</option>
-        <option value="Handwerker">Handwerker</option>
-        <option value="Nagelstudio / Kosmetik">Nagelstudio / Kosmetik</option>
-        <option value="Physiotherapeut / Massage">Physiotherapeut / Massage</option>
-        <option value="Zahnarzt / Arzt">Zahnarzt / Arzt</option>
-        <option value="Fitnessstudio / Yoga">Fitnessstudio / Yoga</option>
-        <option value="Einzelhandel / Shop">Einzelhandel / Shop</option>
-        <option value="Reinigung / Haushaltsservice">Reinigung / Haushaltsservice</option>
-        <option value="Andere">Andere</option>
+        <option>Restaurant / Café</option>
+        <option>Friseur / Salon</option>
+        <option>Handwerker</option>
+        <option>Nagelstudio / Kosmetik</option>
+        <option>Physiotherapeut / Massage</option>
+        <option>Zahnarzt / Arzt</option>
+        <option>Fitnessstudio / Yoga</option>
+        <option>Einzelhandel / Shop</option>
+        <option>Reinigung / Haushaltsservice</option>
+        <option>Andere</option>
       </select>
     </div>
   </div>
@@ -103,7 +101,7 @@
   <div class="result" id="result">
     <div class="divider"></div>
     <div class="section-title">Generierter Code</div>
-    <label style="font-size:13px; color:#666;">Kopiere den Code und speichere ihn als <strong>index.html</strong></label>
+    <label style="font-size:13px;color:#666;">Kopiere den Code und speichere ihn als index.html</label>
     <textarea id="output-code" readonly></textarea>
     <div class="grid-2-btn">
       <button class="btn btn-secondary" onclick="copyCode()">Kopieren</button>
@@ -122,17 +120,11 @@
 </div>
 
 <script>
-const API_KEY = 'DEIN_API_KEY_HIER';
-
 async function callClaude(prompt) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('/api/generate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
-      messages: [{ role: 'user', content: prompt }]
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt })
   });
   const data = await res.json();
   return data.content.map(b => b.text || '').join('').replace(/```html|```/g, '').trim();
@@ -150,9 +142,9 @@ async function generateWebsite() {
   if (!firmenname || !branche || !stadt) { alert('Bitte Firmenname, Branche und Stadt ausfüllen.'); return; }
 
   const stilMap = {
-    modern: 'modernes minimalistisches Design, viel Weißraum, klare Linien, serifenlose Schriften',
-    warm: 'warmes einladendes Design, warme Farbtöne, freundliche Atmosphäre, persönlich',
-    premium: 'elegantes Premium-Design, dunkle Akzentfarben, hochwertige Typografie, exklusiv'
+    modern: 'modernes minimalistisches Design, viel Weißraum, klare Linien',
+    warm: 'warmes einladendes Design, warme Farbtöne, freundliche Atmosphäre',
+    premium: 'elegantes Premium-Design, dunkle Akzentfarben, exklusiv'
   };
 
   document.getElementById('status').style.display = 'block';
@@ -161,7 +153,7 @@ async function generateWebsite() {
   document.getElementById('generate-btn').disabled = true;
 
   try {
-    const html = await callClaude(`Erstelle eine vollständige professionelle HTML-Website als einzelne index.html Datei für:
+    const html = await callClaude(`Erstelle eine vollständige professionelle HTML-Website als einzelne index.html Datei:
 
 Firmenname: ${firmenname}
 Branche: ${branche}
@@ -171,15 +163,8 @@ ${email ? 'E-Mail: ' + email : ''}
 ${beschreibung ? 'Beschreibung: ' + beschreibung : ''}
 Stil: ${stilMap[stil]}
 
-Pflichtanforderungen:
-- Vollständiges HTML mit eingebettetem CSS
-- Hero-Bereich, Über-uns, Leistungen, Kontakt
-- Deutsches Impressum (§5 TMG): Inhabername, Adresse ${stadt}, E-Mail${telefon ? ', Tel' : ''}
-- Datenschutzerklärung nach DSGVO
-- Responsive Design
-- Professionelle Farbpalette passend zur Branche
-
-Nur reinen HTML-Code ausgeben, kein Markdown, keine Erklärungen.`);
+Pflicht: Hero, Über uns, Leistungen, Kontakt, deutsches Impressum (§5 TMG), DSGVO Datenschutz, Responsive.
+Nur reinen HTML-Code ausgeben.`);
 
     document.getElementById('output-code').value = html;
     document.getElementById('status').style.display = 'none';
@@ -197,15 +182,7 @@ async function generateEmail() {
   if (!d) return;
   document.getElementById('email-result').style.display = 'block';
   document.getElementById('output-email').value = 'E-Mail wird generiert...';
-
-  const mail = await callClaude(`Schreib eine kurze professionelle Kaltakquise-E-Mail auf Deutsch an "${d.firmenname}" (${d.branche}) in ${d.stadt}.
-
-Absender: Léon, Swift Pages (swift-pages.de)
-Situation: Wir haben bereits eine kostenlose Demo-Website für sie erstellt.
-Ton: Persönlich, freundlich, nicht aufdringlich, kein Spam-Gefühl.
-Länge: Max 5-6 Sätze.
-Betreff und E-Mail-Text ausgeben, kein Markdown.`);
-
+  const mail = await callClaude(`Schreib eine kurze Kaltakquise-E-Mail auf Deutsch an "${d.firmenname}" (${d.branche}) in ${d.stadt}. Absender: Léon von Swift Pages. Wir haben eine kostenlose Demo-Website erstellt. Ton: persönlich, nicht aufdringlich. Max 5-6 Sätze. Betreff und Text ausgeben.`);
   document.getElementById('output-email').value = mail;
 }
 
